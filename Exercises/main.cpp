@@ -79,23 +79,49 @@ void runSimpleVtableExample() {
 	cout << res;
 }
 
+void runVirtualInheritanceVtableExample() {
+	struct Spam {
+		int m1_ = 0;
+	};
+
+	struct Eggs : virtual public Spam {
+		int m2_ = 0;
+	};
+
+	struct Parrot : virtual public Spam {
+		int m3_ = 0;
+	};
+
+	struct ExParrot : public Eggs, public Parrot {
+		int m4_ = 0;
+	};
+
+
+	ExParrot foo;
+	foo.m1_ = 0x42;
+	foo.m2_ = 0x69;
+	foo.m3_ = 0x1337;
+	foo.m4_ = 0xDEAD;
+	cout << sizeof(foo) << "\n";
+}
+
 void runSchoolExample() {
-	// Exemple prof/étudiant (School.hpp)
+	// Exemple prof/Ã©tudiant (School.hpp)
 	Professor nancySirois(0xDEADBEEF);
 	GraduateStudent lukasLehoux(69420, "Maitrise en nenie fomatique", &nancySirois);
 		
 	Professor karlBachand(0xBADCAFE);
 	ChaoticEvilStudent alexDesrosiers(0xFEEDBABE, "Genie chimique AKA 'comment optimiser la production de meth'", &karlBachand);
 	Student* ptr = &alexDesrosiers;
-	// 'ptr' est un pointeur de Etudiant (up-casté de MauvaisEtudiantBanditPasCorrect)
-	// Si on le dynamic_cast en GradStudent*, ça marche puisque MauvaisEtudiantBanditPasCorrect est dérivé
+	// 'ptr' est un pointeur de Etudiant (up-castÃ© de MauvaisEtudiantBanditPasCorrect)
+	// Si on le dynamic_cast en GradStudent*, Ã§a marche puisque MauvaisEtudiantBanditPasCorrect est dÃ©rivÃ©
 	// de GradStudent, et donc en est un.
 	if ( dynamic_cast<GraduateStudent*>(ptr) != nullptr )
 		cout << "Sup" << endl;
 	else
 		cout << "Pas sup" << endl;
 
-	// Destructeur de MauvaisEtudiantBanditPasCorrect se fait appelé à la fin du scope : I'll be back!
+	// Destructeur de MauvaisEtudiantBanditPasCorrect se fait appelÃ© Ã  la fin du scope : I'll be back!
 }
 
 void runAnimalExample() {
@@ -103,14 +129,75 @@ void runAnimalExample() {
 	unholyAbomination.live();
 	Lion& simba = unholyAbomination;
 	Tiger& tony = unholyAbomination;
+	Animal& animal = unholyAbomination;
 	simba.live();
 	tony.live();
+	animal.live();
+}
+
+void runAmbiguousCallExample() {
+	class LegalEntity {
+	public:
+		LegalEntity(int id) : id_(id) { }
+
+		int getId() const {
+			return id_;
+		}
+
+	private:
+		int id_;
+	};
+
+	class StockExchangeEntity {
+	public:
+		StockExchangeEntity(int id) : id_(id) { }
+
+		int getId() const {
+			return id_;
+		}
+
+	private:
+		int id_;
+	};
+
+	class PublicCompany : public LegalEntity, public StockExchangeEntity {
+	public:
+		PublicCompany(int legalId, int xchgId)
+		: LegalEntity(legalId),
+		  StockExchangeEntity(xchgId) {
+			
+		}
+
+		//using LegalEntity::getId;
+
+		int getReq() const {
+			return LegalEntity::getId();
+		}
+
+		int getStonksId() const {
+			return StockExchangeEntity::getId();
+		}
+
+		pair<int, int> getId() const {
+			return {LegalEntity::getId(), StockExchangeEntity::getId()};
+		}
+	};
+
+	PublicCompany foo(0xDEAD, 0xBEEF);
+	auto&& [req, xchg] = foo.getId();
+	cout << hex << req << "\n";
+	cout << hex << xchg << "\n";
+	//cout << hex << foo.getId() << "\n";
+	//cout << hex << foo.getReq() << "\n";
+	//cout << hex << foo.getStonksId() << "\n";
 }
 
 
 int main() {
-	runSimpleVtableExample(); cout << "\n\n\n\n";
-	runSchoolExample(); cout << "\n\n\n\n";
-	runAnimalExample(); cout << "\n\n\n\n";
+	//runAmbiguousCallExample(); cout << "\n\n\n\n";
+	//runSimpleVtableExample(); cout << "\n\n\n\n";
+	runVirtualInheritanceVtableExample(); cout << "\n\n\n\n";
+	//runSchoolExample(); cout << "\n\n\n\n";
+	//runAnimalExample(); cout << "\n\n\n\n";
 }
 
