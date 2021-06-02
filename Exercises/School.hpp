@@ -62,7 +62,7 @@ private:
 
 // Classe abstraite, plus spécifiquement une classe interface. C'est une interface car c'est une classe abstraite
 // qui n'a aucune données membres. Cette définition est purement une convention et le concept de classe interface
-// n'existe pas direcement dans le langage C++.
+// n'existe pas directement dans le langage C++.
 class IllegalStudent {
 public:
 	virtual ~IllegalStudent() = default;
