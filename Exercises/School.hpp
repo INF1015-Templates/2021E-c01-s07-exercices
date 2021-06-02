@@ -162,14 +162,10 @@ public:
 
 protected:
 	size_t findStudent(int id) {
-		size_t pos = (size_t)-1;
-		for (auto i : range(students_.size())) {
-			if (students_[i]->getStudentId() == id) {
-				pos = i;
-				break;
-			}
-		}
-		return pos;
+		for (auto i : range(students_.size()))
+			if (students_[i]->getStudentId() == id)
+				return i;
+		return (size_t)-1;
 	}
 
 private:
